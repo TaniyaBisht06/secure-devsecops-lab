@@ -1,7 +1,8 @@
 from flask import Flask, request
 
 app = Flask(__name__)
-
+# Intentionally insecure - for SAST demonstration
+API_KEY = "LAB_SECRET_12345"
 
 @app.route("/")
 def home():
