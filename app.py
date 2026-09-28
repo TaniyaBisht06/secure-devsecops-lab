@@ -1,12 +1,13 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
     return """
     <h1>Secure DevSecOps Lab</h1>
-    <p>Security testing demonstration application.</p>
+    <p>This application is used for security testing.</p>
 
     <form action="/search" method="GET">
         <input name="q" placeholder="Search">
@@ -14,14 +15,13 @@ def home():
     </form>
     """
 
+
 @app.route("/search")
 def search():
     query = request.args.get("q", "")
 
-    # Intentionally vulnerable for DAST demonstration
-    return render_template_string(
-        "<h2>Search Result</h2><p>You searched for: " + query + "</p>"
-    )
+    # Intentionally vulnerable - for ZAP DAST demonstration
+    return "<h2>Search Result</h2><p>You searched for: " + query + "</p>"
 
 
 if __name__ == "__main__":
