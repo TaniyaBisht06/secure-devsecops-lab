@@ -1,6 +1,8 @@
 from flask import Flask, request
+from markupsafe import escape
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
@@ -19,8 +21,10 @@ def home():
 def search():
     query = request.args.get("q", "")
 
-    # Intentionally vulnerable - for ZAP DAST demonstration
-    return "<h2>Search Result</h2><p>You searched for: " + query + "</p>"
+    # Escape user input to prevent reflected XSS
+    safe_query = escape(query)
+
+    return f"<h2>Search Result</h2><p>You searched for: {safe_query}</p>"
 
 
 if __name__ == "__main__":
