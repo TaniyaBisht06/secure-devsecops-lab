@@ -12,7 +12,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_search(self):
-        response = self.client.get("/search?q=test")
+        response = self.client.get("/search?q=hello")
         self.assertEqual(response.status_code, 200)
 
 
