@@ -74,7 +74,8 @@ jobs:
           curl http://localhost:5000
 
       # 10. OWASP ZAP - DAST
-      - name: OWASP ZAP Scan
+      - name: OWASP ZAP DAST Scan
         uses: zaproxy/action-baseline@v0.15.0
         with:
           target: http://localhost:5000
+          issue: false
