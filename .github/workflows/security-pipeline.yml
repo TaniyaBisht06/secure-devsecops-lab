@@ -12,38 +12,41 @@ permissions:
   contents: read
 
 jobs:
-  build-test-sonar:
+  security-pipeline:
     runs-on: ubuntu-latest
 
     steps:
 
+      # 1. Checkout source code
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 2. Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      # 3. Install dependencies
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
 
+      # 4. Run Unit Tests
       - name: Run Unit Tests
         run: |
           python -m unittest test_app.py
 
-      - name: SonarQube/SonarCloud Scan
-        continue-on-error: true
+      # 5. SonarQube / SonarCloud - SAST
+      - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
 
+      # 6. Trivy - SCA
       - name: Trivy SCA Scan
-        continue-on-error: true
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
@@ -51,10 +54,12 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: 1
 
+      # 7. Build Docker Image
       - name: Build Docker Image
         run: |
           docker build -t secure-devsecops-lab .
 
+      # 8. Start Application
       - name: Start Application
         run: |
           docker run -d \
@@ -62,13 +67,14 @@ jobs:
             -p 5000:5000 \
             secure-devsecops-lab
 
+      # 9. Wait for Application
       - name: Wait for Application
         run: |
           sleep 10
           curl http://localhost:5000
 
-      - name: OWASP ZAP DAST Scan
-        continue-on-error: true
+      # 10. OWASP ZAP - DAST
+      - name: OWASP ZAP Scan
         uses: zaproxy/action-baseline@v0.15.0
         with:
-          target: "http://localhost:5000"
+          target: http://localhost:5000
